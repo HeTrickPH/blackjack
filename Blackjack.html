@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Black jack</title>
+
+	<h1>BlackJack</h1>
+	<script>
+		var playerWallet = 5000;
+		var playerWalletBet = 0;
+		var betAmnt = 500;
+		var betAmnt2 = 100;
+		var betAmnt3 = 50;
+		var betAmnt4 = 25;
+		var betAmnt5 = 5;
+		function card(value, value_opt, number, suit) {
+			this.value = value;
+			this.value_opt = value_opt;
+			this.number = number;
+			this.suit = suit;
+		}
+		var cards = [];
+		var cardNumbers = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
+		var suits = ["Spades", "Diamonds", "Hearts", "Clubs"];
+		
+		// Local variables 
+		var card1;
+		var card2;	
+		var card3;
+		var card4;
+		var dealerCards = [];		
+		var hitCard;
+		var hitCard1;
+		var playersCards = [];
+		
+		
+		window.onload = function deck() {
+			for (var i = 0; i < suits.length; i++) {
+				for (var j = 0; j < cardNumbers.length; j++) {
+					cards.push(new card(
+						(function () {
+							if (typeof cardNumbers[j] != "number") {
+								if (cardNumbers[j] == "A") {
+									return 1;
+								}
+								else {
+									return 10;
+								}
+							}
+							else {
+								return j + 1;
+							}
+						})(),
+						(function () {
+							if (card.number == "A") {
+								return 11;
+							}
+							else {
+								return null;
+							}
+						})(),
+						cardNumbers[j], suits[i]));
+				}
+			}			
+			//betAmnt = 100; 
+			//dealPlayer();
+			return cards;
+		}
+		function pullCard() {
+			var num = Math.floor(Math.random() * (cards.length));
+			var chosenCard = cards[num];
+			cards.splice(num, 1);
+			return chosenCard;
+		}
+		// Input/Parameters: none
+		// Output/Return
+		function getNewDeck() {
+			var deck = [];
+			for (var i = 0; i < 52; i++) {
+				var c1 = pullCard();
+				deck.push(c1);
+			}
+			return deck;
+		}		
+		
+		function dealPlayer() {
+			card1 = pullCard();
+			card2 = pullCard();
+			playersCards.push(card1,card2);
+			document.getElementById('myHand').innerHTML = card1.number + ' | '
+				+ card1.suit + ' | ' + card2.number + ' | ' + card2.suit;
+			//console.log(card1.value + card2.value);
+			console.log(playersCards);
+			document.getElementById('dealHand').style.visibility = "hidden";
+			document.getElementById('dealPlayer').disabled = true
+			document.getElementById("betAmnt").disabled = true;
+			document.getElementById("betAmnt2").disabled = true;
+			document.getElementById("betAmnt3").disabled = true;
+			document.getElementById("betAmnt4").disabled = true;
+			document.getElementById("betAmnt5").disabled = true;
+			dealDealer();
+		}
+		
+		function dealDealer() {
+			card3 = pullCard();
+			card4 = pullCard();
+			dealerCards.push(card3,card4);
+			document.getElementById('dealHand').innerHTML = card3.number + " " + card3.suit;
+			document.getElementById('dealHand2').innerHTML = card4.number + " " + card4.suit;
+		}
+		
+		function hitPlayer() {
+			hitCard = pullCard();
+			hitCard = cards[0]
+			playersCards.push(hitCard);
+			displayPlayerCards();
+			if (getCardTotal(playersCards) > 21) {
+				document.getElementById("hit").disabled = true;
+				document.getElementById("amntBet").innerHTML = "0";
+				alert("you lost");
+				document.getElementById("myHand").innerHTML = "New hand click deal";
+				document.getElementById("dealHand").style.visibility = "visible";
+				document.getElementById("dealPlayer").disabled = false;
+				document.getElementById("betAmnt").disabled = false;
+				document.getElementById("betAmnt2").disabled = false;
+				document.getElementById("betAmnt3").disabled = false;
+				document.getElementById("betAmnt4").disabled = false;
+				document.getElementById("betAmnt5").disabled = false;
+			}
+		}
+		function displayPlayerCards() {
+		     document.getElementById('myHand').innerHTML = hitCard.number + hitCard.suit + ' ' + document.getElementById('myHand').innerHTML;
+		}
+		
+		function standPlayer() {
+				document.getElementById('dealHand').style.visibility = "visible";
+				document.getElementById('hit').disabled = true; 
+			while (getCardTotal(dealerCards) < 17){
+			hitDealer();
+			}
+		compareCards();
+		}
+		
+	function getCardTotal(arrayIn) {
+			var total = 0, totalMax = 0; 
+			for (var i = 0; i< arrayIn.length; i++ )
+			{				
+				if (arrayIn[i].number == "A") {				
+						totalMax += 11; 
+					}
+				else {
+					totalMax += arrayIn[i].value; 
+				}				
+				total += arrayIn[i].value ;
+				if (totalMax > total && totalMax <= 21)
+				   total = totalMax;				   
+			}		
+		return total;
+	}			
+		
+		function hitDealer() {
+			var hitCard1 = pullCard();
+			// TEST CODE
+			dealerCards.push(hitCard1);
+			document.getElementById('dealHand2').innerHTML = hitCard1.number + " | " + hitCard1.suit + " | " + document.getElementById('dealHand2').innerHTML;
+		}
+		function compareCards(){	
+			 if (getCardTotal(dealerCards) > 21){
+				alert("dealer busted");
+					playerWallet += playerWalletBet;
+			}
+			else if (getCardTotal(dealerCards) < getCardTotal(playersCards)) {
+					alert("you won");
+					playerWallet += playerWalletBet;
+				}
+			else if (getCardTotal(dealerCards) > getCardTotal(playersCards)) {
+					alert("you lost");
+					playerWallet -= playerWalletBet;
+				}
+			else if (getCardTotal(dealerCards) == getCardTotal(playersCards)) {
+					alert("you push, no win, no loss");
+			}
+		}
+		
+		function betMoney(betamount) {
+			document.getElementById("playerWallet").innerHTML =
+				playerWallet -= betamount;
+			document.getElementById("amntBet").innerHTML =
+				playerWalletBet += betamount;
+			checkWallet();
+		}
+		function checkWallet() {
+			if (playerWallet < 500) {
+				document.getElementById("betAmnt").disabled = true;
+			}
+			if (playerWallet < 100) {
+				document.getElementById("betAmnt2").disabled = true;
+			}
+			if (playerWallet < 50) {
+				document.getElementById("betAmnt3").disabled = true;
+			}
+			if (playerWallet < 25) {
+				document.getElementById("betAmnt4").disabled = true;
+			}
+			if (playerWallet < 5) {
+				document.getElementById("betAmnt5").disabled = true;
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<button id="betAmnt5" onClick="betMoney(5)">Bet 5</button>
+	<button id="betAmnt4" onClick="betMoney(25)">Bet 25</button>
+	<button id="betAmnt3" onClick="betMoney(50)">Bet 50</button>
+	<button id="betAmnt2" onClick="betMoney(100)">Bet 100</button>
+	<button id="betAmnt" onClick="betMoney(500)">Bet 500</button>
+
+	<button id="dealPlayer" onClick="dealPlayer()">Deal Cards</button>
+
+	<p>Money you have</p>
+	<p id="playerWallet">5000</p>
+
+	<p>Money you Bet</p>
+	<p id="amntBet">0</p>
+
+	<p>My Cards</p>
+	<p id="myHand"></p>
+
+
+	<button id="hit" onClick="hitPlayer()">Hit</button>
+	<button onClick="standPlayer()">Stand</button>
+
+	<p>Dealer Cards</p>
+	<p id="dealHand"></p>
+	<p id="dealHand2"></p>
+</body>
+
+</html>

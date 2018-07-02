@@ -1,0 +1,56 @@
+body {
+    background-color: #004d1a;
+    
+}
+
+#window {
+    top:0;
+    left:0;
+    
+}
+
+#board {
+    min-height: 600px; 
+    min-width: 850px;
+}
+
+#playingArea {
+    margin:auto;
+    max-width: 1200px;
+}
+
+#dealerHand, #myHand {
+    display: inline;
+}
+
+#footer {
+    min-height: 100px;
+    min-width: 1000px;
+}
+#user {
+    margin:auto;
+    max-width: 1200px;
+    
+}
+
+#user_info {
+    min-width: 250px;
+    max-width: 300px;
+    display: inline;
+}
+#user_info input {
+    width: auto;
+}
+
+#user_action {
+    min-width: 500px;
+    max-width: 600px;
+    display: inline;
+    
+}
+
+#user_bet {
+    min-width: 250px;
+    max-width: 300px;
+    display: inline;
+}

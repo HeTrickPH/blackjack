@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Black Jack</title>
+        
+        <!--angular-->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+        
+        <script src="blackjack.js"></script>
+        <link rel=stylesheet href="blackjack.css">
+    </head>
+    
+
+    <body>
+        
+        <div id="window" ng-app="blackjackApp" ng-controller="blackjackCtrl">
+            <div id="board">
+                <div id="playingArea" style="border: 1px solid black">
+                    <div id="dealer">
+                        <div id="dealer_cards">
+                            <div id="dealerHand" ng-repeat="x in dealerHand">
+                                <img ng-src="{{x.image}}" width="100px">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="player">
+                        <div id="user_cards">
+                            <div id="myHand" ng-repeat="y in playerHand">
+                                <img ng-src="{{y.image}}" width="100px">
+                            </div>
+                        </div>
+                    </div>
+                </div>        
+            </div>
+            <div id="footer">
+                <div id="user" style="border: 1px solid black">
+                    <div id="user_info">
+                        <input type="number" id="playerAmount" ng-value="playerAmount">
+                        <input type="number" id="amntBet" ng-value="playerAmountBet">
+                    </div>
+                    <div id="user_action">
+                        <button id="hit" ng-click="hitPlayer()">Hit</button>
+                        <button ng-click="standPlayer()">Stand</button>
+                        <button ng-click="dealPlayer()">deal player</button>
+
+                    </div>
+                    <div id="user_bet">
+                        <input type="button" id="betAmnt1" ng-click="betMoney(5)" value="5">
+                        <input type="button" id="betAmnt2" ng-click="betMoney(25)" value="25">
+                        <input type="button" id="betAmnt3" ng-click="betMoney(50)" value="50">
+                        <input type="button" id="betAmnt4" ng-click="betMoney(100)" value="100">
+                        <input type="button" id="betAmnt5" ng-lick="betMoney(500)" value="500">
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </body>
+</html>

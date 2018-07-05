@@ -1,7 +1,7 @@
 (function() {
 var app = angular.module('blackjackApp', [])
 app.controller('blackjackCtrl', function($scope) {
-    
+
 $scope.playerAmount = 5000;
 $scope.playerAmountBet = 0;
 $scope.betAmnt = 5;
@@ -12,8 +12,8 @@ $scope.betAmnt5 = 500;
 
 function card(value, value_opt, number, suit, image) {
     this.value = value;
-	this.value_opt = value_opt;
-	this.number = number;
+    this.value_opt = value_opt;
+    this.number = number;
     this.suit = suit;
     this.image = image;
 }
@@ -22,22 +22,22 @@ var cardNumbers = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
 var suits = ["Spades", "Diamonds", "Hearts", "Clubs"];
 
 window.onload = deck();
-    
+
 function deck() {
     for (var i = 0; i < suits.length; i++) {
         for (var j = 0; j < cardNumbers.length; j++) {
             // Var 2 - value_opt
-            var value_opt = null; 
+            var value_opt = null;
             if (cardNumbers[j] == "A") value_opt = 11;
             var value = j + 1;
             if (typeof cardNumbers[j] != "number") {
                 if (cardNumbers[j] == "A"){
                     value = 1;
-                    
+
                 }
                 else {value = 10};
             }
-				 
+
             cards.push(new card(
                 value,
 				value_opt,
@@ -49,7 +49,7 @@ function deck() {
     }
 }
 
-function getImageName(cardNum, suit) {        
+function getImageName(cardNum, suit) {
     var cardSuit = "";
      switch (suit) {
         case "Spades":
@@ -70,7 +70,7 @@ function getImageName(cardNum, suit) {
 
         default:
             console.log("Error in suit");
-            break; 
+            break;
     }
     return "img/cards/" + cardNum + cardSuit + ".png";
 }
@@ -79,7 +79,7 @@ function pullCard() {
     var num = Math.floor(Math.random() * (cards.length));
     var ChosenCard = cards[num];
     cards.splice(num, 1);
-			
+
     return ChosenCard;
 }
 
@@ -131,7 +131,7 @@ function hitDealer() {
 //    else(card3.value + card4.value > 17)
 //
 //}
-		
+
 
 $scope.betMoney = function(betamount) {
     $scope.playerAmount -= betamount;
@@ -139,57 +139,60 @@ $scope.betMoney = function(betamount) {
     checkWallet();
 }
 
-function checkWallet() {
-    
+$scope.disableBtn = function(call) {
+    if(call == true) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
-    
-function dealerAI(){
-    
-    var situation = 0;
-    
-    //player stand
-    if(situation == 0){
-        //hit dealer util count reach 17
-        while(getCardTotal($scope.dealerHand) < 17) {
-            hitDealer();
-        }  
-    
-        //determine win, loose, push
-        switch(compare(getCardTotal($scope.dealerHand), getCardTotal($scope.playerHand))) {
-            case 0:
-                determineWinner(1);
-                break;
-                
-            case 1:
-                determineWinner(2);
-                break;
-            
-            case 2:
-                determineWinner(3);
-                break;
-        }
-    
-    }
-    //player busted
-    else if(situation == 1){
-        
-    }
 
+function dealerAI(){
+    while(cards.length > 0) {
+        //player got blackjack
+        if(getCardTotal($scope.playerHand) == 21) {
+            
+
+        }
+        //player busted
+        else if() {
+
+        }
+        //determine win, loose, push
+        // switch(compare(getCardTotal($scope.dealerHand), getCardTotal($scope.playerHand))) {
+        //     case 0:
+        //         determineWinner("win");
+        //         break;
+        //     case 1:
+        //         determineWinner("loose");
+        //         break;
+        //     case 2:
+        //         determineWinner("push");
+        //         break;
+        // }
+    }
+}
+
+function dealer() {
+    while(getCardTotal($scope.dealerHand) < 17) {
+        hitDealer();
+    }
 }
 
 function getCardTotal(arrayIn) {
-    var total = 0, totalMax = 0; 
-    for (var i = 0; i< arrayIn.length; i++ ) {				
-        if (arrayIn[i].number == "A") {				
-            totalMax += 11; 
+    var total = 0, totalMax = 0;
+    for (var i = 0; i< arrayIn.length; i++ ) {
+        if (arrayIn[i].number == "A") {
+            totalMax += 11;
         }
         else {
-            totalMax += arrayIn[i].value; 
-        }				
+            totalMax += arrayIn[i].value;
+        }
         total += arrayIn[i].value ;
         if (totalMax > total && totalMax <= 21)
-            total = totalMax;				   
-    }		
+            total = totalMax;
+    }
 	return total;
 }
 
@@ -198,7 +201,7 @@ function compare(a, b) {
     if(a > b) {
         result = 0;
     }
-       
+
     else if(a < b) {
         result = 1;
     }
@@ -207,18 +210,20 @@ function compare(a, b) {
     }
     return result;
 }
-    
+
 function determineWinner(call) {
-    if(call == 1) {
+    if(call == "win") {
         return true;
     }
-    else if(call == 2){
+    else if(call == "loose"){
         return false;
     }
-    else if(call == 3){
+    else if(call == "push"){
         return "push";
     }
 }
+
+
 
 
 

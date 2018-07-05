@@ -148,29 +148,26 @@ $scope.disableBtn = function(call) {
     }
 }
 
-function dealerAI(){
+function programAI(){
     while(cards.length > 0) {
         //player got blackjack
         if(getCardTotal($scope.playerHand) == 21) {
-            
-
+            determineWinner();
         }
         //player busted
-        else if() {
-
+        else if(getCardTotal($scope.playerHand) > 21) {
+            callWinner("loose");
         }
-        //determine win, loose, push
-        // switch(compare(getCardTotal($scope.dealerHand), getCardTotal($scope.playerHand))) {
-        //     case 0:
-        //         determineWinner("win");
-        //         break;
-        //     case 1:
-        //         determineWinner("loose");
-        //         break;
-        //     case 2:
-        //         determineWinner("push");
-        //         break;
-        // }
+
+        dealer();
+        //check dealer busted
+        if(getCardTotal($scope.dealer) < 21) {
+            determineWinner();
+        }
+        else {
+            callWinner("win");
+        }
+
     }
 }
 
@@ -211,7 +208,22 @@ function compare(a, b) {
     return result;
 }
 
-function determineWinner(call) {
+function determineWinner() {
+    switch(compare(getCardTotal($scope.playerHand), getCardTotal($scope.dealerHand))) {
+        case 0:
+            callWinner("win");
+            break;
+        case 1:
+            callWinner("loose");
+            break;
+        case 2:
+            callWinner("push");
+            break;
+    }
+}
+
+
+function callWinner(call) {
     if(call == "win") {
         return true;
     }

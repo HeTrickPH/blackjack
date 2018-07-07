@@ -35,7 +35,7 @@ function deck() {
                     value = 1;
 
                 }
-                else {value = 10};
+                else {value = 10}
             }
 
             cards.push(new card(
@@ -49,30 +49,55 @@ function deck() {
     }
 }
 
+//function getImageName(cardNum, suit) {
+//    var cardSuit = "";
+//     switch (suit) {
+//        case "Spades":
+//            cardSuit = "s";
+//            break;
+//
+//        case "Diamonds":
+//            cardSuit = "d";
+//            break;
+//
+//        case "Hearts":
+//            cardSuit = "h";
+//            break;
+//
+//        case "Clubs":
+//            cardSuit = "c";
+//            break;
+//
+//        default:
+//            console.log("Error in suit");
+//            break;
+//    }
+//    return "img/cards/" + cardNum + cardSuit + ".png";
+//}
 function getImageName(cardNum, suit) {
     var cardSuit = "";
      switch (suit) {
         case "Spades":
-            cardSuit = "s";
+            cardSuit = "S";
             break;
 
         case "Diamonds":
-            cardSuit = "d";
+            cardSuit = "D";
             break;
 
         case "Hearts":
-            cardSuit = "h";
+            cardSuit = "H";
             break;
 
         case "Clubs":
-            cardSuit = "c";
+            cardSuit = "C";
             break;
 
         default:
             console.log("Error in suit");
             break;
     }
-    return "img/cards/" + cardNum + cardSuit + ".png";
+    return "img/" + cardSuit + cardNum +  ".png";
 }
 
 function pullCard() {
@@ -97,11 +122,11 @@ $scope.dealPlayer = function() {
     while($scope.playerHand.length < 2) {
         $scope.hitPlayer();
     }
-    document.getElementById("betAmnt").disabled = true;
-    document.getElementById("betAmnt2").disabled = true;
-    document.getElementById("betAmnt3").disabled = true;
-    document.getElementById("betAmnt4").disabled = true;
-    document.getElementById("betAmnt5").disabled = true;
+//    document.getElementById("betAmnt").disabled = true;
+//    document.getElementById("betAmnt2").disabled = true;
+//    document.getElementById("betAmnt3").disabled = true;
+//    document.getElementById("betAmnt4").disabled = true;
+//    document.getElementById("betAmnt5").disabled = true;
     $scope.dealDealer();
 }
 
@@ -120,23 +145,14 @@ function hitDealer() {
     $scope.dealerHand.push(pullCard());
 }
 
-//$scope.standPlayer = function() {
-//    document.getElementById('hit').disabled = true;
-//    if (card3.value + card4.value <= 17){
-//        hitDealer();
-//    }
-//    if (card3.value + card4.value <= 17){
-//        hitDealer();
-//    }
-//    else(card3.value + card4.value > 17)
-//
-//}
+$scope.standPlayer = function() {
+    programAI();
+}
 
 
 $scope.betMoney = function(betamount) {
     $scope.playerAmount -= betamount;
     $scope.playerAmountBet += betamount;
-    checkWallet();
 }
 
 $scope.disableBtn = function(call) {
@@ -148,28 +164,6 @@ $scope.disableBtn = function(call) {
     }
 }
 
-function programAI(){
-    while(cards.length > 0) {
-        //player got blackjack
-        if(getCardTotal($scope.playerHand) == 21) {
-            determineWinner();
-        }
-        //player busted
-        else if(getCardTotal($scope.playerHand) > 21) {
-            callWinner("loose");
-        }
-
-        dealer();
-        //check dealer busted
-        if(getCardTotal($scope.dealer) < 21) {
-            determineWinner();
-        }
-        else {
-            callWinner("win");
-        }
-
-    }
-}
 
 function dealer() {
     while(getCardTotal($scope.dealerHand) < 17) {
@@ -208,7 +202,7 @@ function compare(a, b) {
     return result;
 }
 
-function determineWinner() {
+function compareCards() {
     switch(compare(getCardTotal($scope.playerHand), getCardTotal($scope.dealerHand))) {
         case 0:
             callWinner("win");
@@ -225,18 +219,64 @@ function determineWinner() {
 
 function callWinner(call) {
     if(call == "win") {
-        return true;
+        if($scope.playerHand.length == 2 && getCardTotal($scope.playerHand) == 21 && (function(){for(var i = 0;i < $scope.playerHand.length;i++){if($scope.playerHand[i].number == "A"){return true;}}})() == true) {
+           walletChange("blackjack");
+        }
+        else{
+           walletChange("win");
+        }
     }
     else if(call == "loose"){
-        return false;
+        walletChange("loose");
     }
     else if(call == "push"){
-        return "push";
+        walletChange("push");
+    }
+}
+    
+function walletChange(situation) {
+    switch(situation) {
+        case "blackjack":
+            $scope.playerAmount += $scope.playerAmountBet * 2.5;
+            break;
+        case "win":
+            $scope.playerAmount += $scope.playerAmountBet * 2;
+            break;
+        case "loose":
+            $scope.playerAmount -= $scope.playerAmountBet;
+            break;
+        default:
+            $scope.playerAmount += $scope.playerAmountBet;
     }
 }
 
-
-
+function programAI() {
+    if($scope.playerAmountBet > 0){
+       
+        //player got blackjack
+        if(getCardTotal($scope.playerHand) == 21) {
+            compareCards();
+        }
+        //player busted
+        else if(getCardTotal($scope.playerHand) > 21) {
+            callWinner("loose");
+        }
+        else if() {
+            dealer();
+            //check dealer busted
+            if(getCardTotal($scope.dealerHand) < 21) {
+                compareCards();
+            
+            }
+            else {
+                callWinner("win");
+            }
+        }
+    }
+    else {
+        alert("you need to bet before deal cards");
+    }
+}
 
 
 });

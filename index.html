@@ -40,10 +40,9 @@
                         <input type="number" id="amntBet" ng-value="playerAmountBet">
                     </div>
                     <div id="user_action">
-                        <button id="hit" ng-click="hitPlayer()">Hit</button>
-                        <button ng-click="standPlayer()">Stand</button>
-                        <button ng-click="dealPlayer()">deal player</button>
-
+                        <button id="Start" ng-click="blackjackAI('Start')">Start</button>
+                        <button id="hit" ng-click="blackjackAI('Hit')">Hit</button>
+                        <button ng-click="blackjackAI('Stand')">Stand</button>
                     </div>
                     <div id="user_bet">
                         <input type="button" id="betAmnt1" ng-click="betMoney(5)" value="5">
@@ -53,6 +52,10 @@
                         <input type="button" id="betAmnt5" ng-click="betMoney(500)" value="500">
                     </div>
                 </div>
+            </div>
+            <div id="overlay" ng-hide="display" ng-click="display = true">
+                <div class="overlay_info" id="text">{{overlayText}}</div>
+                <div class="overlay_info" id="money">{{overlayMoney}}</div>
             </div>
         </div> 
     </body>

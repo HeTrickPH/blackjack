@@ -43,63 +43,12 @@ function deck() {
 				value_opt,
                 cardNumbers[j],
                 suits[i],
-                getImageName(cardNumbers[j], suits[i])
+                "img/" + cardNumbers[j] + suits[i] + ".png"
             ));
         }
     }
 }
-
-//function getImageName(cardNum, suit) {
-//    var cardSuit = "";
-//     switch (suit) {
-//        case "Spades":
-//            cardSuit = "s";
-//            break;
-//
-//        case "Diamonds":
-//            cardSuit = "d";
-//            break;
-//
-//        case "Hearts":
-//            cardSuit = "h";
-//            break;
-//
-//        case "Clubs":
-//            cardSuit = "c";
-//            break;
-//
-//        default:
-//            console.log("Error in suit");
-//            break;
-//    }
-//    return "img/cards/" + cardNum + cardSuit + ".png";
-//}
-function getImageName(cardNum, suit) {
-    var cardSuit = "";
-     switch (suit) {
-        case "Spades":
-            cardSuit = "S";
-            break;
-
-        case "Diamonds":
-            cardSuit = "D";
-            break;
-
-        case "Hearts":
-            cardSuit = "H";
-            break;
-
-        case "Clubs":
-            cardSuit = "C";
-            break;
-
-        default:
-            console.log("Error in suit");
-            break;
-    }
-    return "img/" + cardSuit + cardNum +  ".png";
-}
-
+	
 function pullCard() {
     var num = Math.floor(Math.random() * (cards.length));
     var ChosenCard = cards[num];

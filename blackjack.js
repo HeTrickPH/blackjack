@@ -9,7 +9,15 @@ $scope.betAmnt2 = 25;
 $scope.betAmnt3 = 50;
 $scope.betAmnt4 = 100;
 $scope.betAmnt5 = 500;
+$scope.betMoney = function(betamount) {
+    $scope.playerAmount -= betamount;
+    $scope.playerAmountBet += betamount;
+}
 
+$scope.playerHand = [];
+$scope.dealerHand = [];
+                                         
+    
 function card(value, value_opt, number, suit, image) {
     this.value = value;
     this.value_opt = value_opt;
@@ -17,13 +25,15 @@ function card(value, value_opt, number, suit, image) {
     this.suit = suit;
     this.image = image;
 }
+    
 var cards = [];
-var cardNumbers = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-var suits = ["Spades", "Diamonds", "Hearts", "Clubs"];
 
 window.onload = deck();
 
 function deck() {
+    cards = [];
+    var cardNumbers = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
+    var suits = ["S", "D", "H", "C"];//"Spades", "Diamonds", "Hearts", "Clubs"
     for (var i = 0; i < suits.length; i++) {
         for (var j = 0; j < cardNumbers.length; j++) {
             // Var 2 - value_opt
@@ -43,12 +53,12 @@ function deck() {
 				value_opt,
                 cardNumbers[j],
                 suits[i],
-                "img/" + cardNumbers[j] + suits[i] + ".png"
+                "img/" + suits[i] + cardNumbers[j] +  ".png"
             ));
         }
     }
 }
-	
+
 function pullCard() {
     var num = Math.floor(Math.random() * (cards.length));
     var ChosenCard = cards[num];
@@ -56,70 +66,7 @@ function pullCard() {
 
     return ChosenCard;
 }
-
-function getNewDeck() {
-	var deck = [];
-	for (var i = 0; i < 52; i++) {
-        var c1 = pullCard();
-		deck.push(c1);
-	}
-	return deck;
-}
-
-$scope.playerHand = [];
-$scope.dealPlayer = function() {
-    while($scope.playerHand.length < 2) {
-        $scope.hitPlayer();
-    }
-//    document.getElementById("betAmnt").disabled = true;
-//    document.getElementById("betAmnt2").disabled = true;
-//    document.getElementById("betAmnt3").disabled = true;
-//    document.getElementById("betAmnt4").disabled = true;
-//    document.getElementById("betAmnt5").disabled = true;
-    $scope.dealDealer();
-}
-
-$scope.dealerHand = [];
-$scope.dealDealer = function() {
-    while($scope.dealerHand.length < 2) {
-        hitDealer();
-    }
-}
-
-$scope.hitPlayer = function() {
-	$scope.playerHand.push(pullCard());
-}
-
-function hitDealer() {
-    $scope.dealerHand.push(pullCard());
-}
-
-$scope.standPlayer = function() {
-    programAI();
-}
-
-
-$scope.betMoney = function(betamount) {
-    $scope.playerAmount -= betamount;
-    $scope.playerAmountBet += betamount;
-}
-
-$scope.disableBtn = function(call) {
-    if(call == true) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-
-function dealer() {
-    while(getCardTotal($scope.dealerHand) < 17) {
-        hitDealer();
-    }
-}
-
+    
 function getCardTotal(arrayIn) {
     var total = 0, totalMax = 0;
     for (var i = 0; i< arrayIn.length; i++ ) {
@@ -135,98 +82,97 @@ function getCardTotal(arrayIn) {
     }
 	return total;
 }
+    
+function DealCard(Who) {
 
-function compare(a, b) {
-    var result = "null"
-    if(a > b) {
-        result = 0;
+    if (Who == "player") {
+        $scope.playerHand.push(pullCard());
+    } else if (Who == "dealer") {
+        $scope.dealerHand.push(pullCard());
+        if ($scope.dealerHand.length == 1) {$scope.dealerHand[0].image = "img/back.png"}
     }
-
-    else if(a < b) {
-        result = 1;
-    }
-    else if(a == b) {
-        result = 2;
-    }
-    return result;
 }
 
-function compareCards() {
-    switch(compare(getCardTotal($scope.playerHand), getCardTotal($scope.dealerHand))) {
-        case 0:
-            callWinner("win");
-            break;
-        case 1:
+$scope.blackjackAI = function(phase) {
+    if (cards.length <= (cards.length / 5)) {
+        deck();
+    }
+    if (phase == "Start") {//Deal 2 cards to dealer and player
+        clearTable();
+        DealCard("dealer");
+        DealCard("player"); 
+        DealCard("dealer");
+        DealCard("player");
+        
+    } else if (phase == "Hit") {//Deal 1 card to player and see busted or not
+        DealCard("player");
+        if (getCardTotal($scope.playerHand) > 21){
             callWinner("loose");
-            break;
-        case 2:
-            callWinner("push");
-            break;
+        }
+    } else if (phase == "Stand") {
+        stand();
     }
+    
 }
 
-
-function callWinner(call) {
-    if(call == "win") {
-        if($scope.playerHand.length == 2 && getCardTotal($scope.playerHand) == 21 && (function(){for(var i = 0;i < $scope.playerHand.length;i++){if($scope.playerHand[i].number == "A"){return true;}}})() == true) {
-           walletChange("blackjack");
-        }
-        else{
-           walletChange("win");
-        }
+function stand() {
+    $scope.dealerHand[0].image = "img/" + $scope.dealerHand[0].suit + $scope.dealerHand[0].number + ".png";
+    if (getCardTotal($scope.dealerHand) > getCardTotal($scope.playerHand)) {
+        callWinner("loose");
+    } else if (getCardTotal($scope.dealerHand) == 21 && getCardTotal($scope.playerHand) == 21) {
+        callWinner("Draw");
     }
-    else if(call == "loose"){
-        walletChange("loose");
-    }
-    else if(call == "push"){
-        walletChange("push");
+    
+    while(getCardTotal($scope.dealerHand) < 17) {
+        DealCard("dealer");
+        if (getCardTotal($scope.dealerHand) > 21) {
+            callWinner("win");
+        } 
+        else if (getCardTotal($scope.dealerHand) < getCardTotal($scope.playerHand)) {
+            callWinner("loose");
+        }
+        else if (getCardTotal($scope.dealerHand) == 21 && getCardTotal($scope.playerHand) == 21) {
+            callWinner("Draw");
+        }
     }
 }
     
-function walletChange(situation) {
-    switch(situation) {
-        case "blackjack":
-            $scope.playerAmount += $scope.playerAmountBet * 2.5;
-            break;
+function callWinner(call) {
+    var money = 0;
+    switch(call) {
         case "win":
             $scope.playerAmount += $scope.playerAmountBet * 2;
+            money = $scope.playerAmountBet * 2
             break;
         case "loose":
-            $scope.playerAmount -= $scope.playerAmountBet;
+            $scope.playerAmountBet = 0;
             break;
-        default:
+        case "Draw":
             $scope.playerAmount += $scope.playerAmountBet;
+            money = $scope.playerAmountBet;
+            break;
     }
+    overlayDisplay(call, money);
+    //clearTable();
 }
 
-function programAI() {
-    if($scope.playerAmountBet > 0){
-       
-        //player got blackjack
-        if(getCardTotal($scope.playerHand) == 21) {
-            compareCards();
-        }
-        //player busted
-        else if(getCardTotal($scope.playerHand) > 21) {
-            callWinner("loose");
-        }
-        else if() {
-            dealer();
-            //check dealer busted
-            if(getCardTotal($scope.dealerHand) < 21) {
-                compareCards();
-            
-            }
-            else {
-                callWinner("win");
-            }
-        }
+$scope.display = true;
+function overlayDisplay(txt, money) {
+    debugger;
+    $scope.overlayText = txt.toUpperCase(); 
+    if (money == 0) {
+        $scope.overlayMoney = "";//change to disable later
+    } else {
+        $scope.overlayMoney = "$" + money;
     }
-    else {
-        alert("you need to bet before deal cards");
-    }
+    $scope.display = false;
 }
 
+function clearTable(){
+    debugger;
+    $scope.playerHand = [];
+    $scope.dealerHand = [];
+}
 
 });
 }) ();

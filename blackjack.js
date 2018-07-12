@@ -16,8 +16,8 @@ $scope.betMoney = function(betamount) {
 
 $scope.playerHand = [];
 $scope.dealerHand = [];
-                                         
-    
+
+
 function card(value, value_opt, number, suit, image) {
     this.value = value;
     this.value_opt = value_opt;
@@ -25,7 +25,7 @@ function card(value, value_opt, number, suit, image) {
     this.suit = suit;
     this.image = image;
 }
-    
+
 var cards = [];
 
 window.onload = deck();
@@ -33,7 +33,7 @@ window.onload = deck();
 function deck() {
     cards = [];
     var cardNumbers = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-    var suits = ["S", "D", "H", "C"];//"Spades", "Diamonds", "Hearts", "Clubs"
+    var suits = ["s", "d", "h", "c"];//"Spades", "Diamonds", "Hearts", "Clubs"
     for (var i = 0; i < suits.length; i++) {
         for (var j = 0; j < cardNumbers.length; j++) {
             // Var 2 - value_opt
@@ -50,10 +50,10 @@ function deck() {
 
             cards.push(new card(
                 value,
-				value_opt,
+				        value_opt,
                 cardNumbers[j],
                 suits[i],
-                "img/" + suits[i] + cardNumbers[j] +  ".png"
+                "img/cards/" + cardNumbers[j] + suits[i] +  ".png"
             ));
         }
     }
@@ -66,7 +66,7 @@ function pullCard() {
 
     return ChosenCard;
 }
-    
+
 function getCardTotal(arrayIn) {
     var total = 0, totalMax = 0;
     for (var i = 0; i< arrayIn.length; i++ ) {
@@ -82,69 +82,88 @@ function getCardTotal(arrayIn) {
     }
 	return total;
 }
-    
-function DealCard(Who) {
 
-    if (Who == "player") {
-        $scope.playerHand.push(pullCard());
-    } else if (Who == "dealer") {
-        $scope.dealerHand.push(pullCard());
-        if ($scope.dealerHand.length == 1) {$scope.dealerHand[0].image = "img/back.png"}
+function DealCard(Who) {
+          if (Who == "player") {
+              $scope.playerHand.push(pullCard());
+          } else if (Who == "dealer") {
+              $scope.dealerHand.push(pullCard());
+              if ($scope.dealerHand.length == 1) {$scope.dealerHand[0].image = "img/cards/back.png"}
+          }
+
+
+}
+
+//function sleep (time) {
+//  return new Promise((resolve) => setTimeout(resolve, time));
+//}
+var GamePhase = "betting";
+$scope.blackjackAI = function(order) {
+    if (order == "Start" && GamePhase == "betting") {//Deal 2 cards to dealer and player
+        Start();
+        GamePhase = "During Game"
+    } else if (order == "Hit" && GamePhase == "During Game") {//Deal 1 card to player and see busted or not
+        Hit();
+    } else if (order == "Stand" && GamePhase == "During Game") {
+        stand();
     }
 }
 
-$scope.blackjackAI = function(phase) {
-    if (cards.length <= (cards.length / 5)) {
-        deck();
+function Start() {
+  clearTable();//Later move to callwinner
+  DealCard("dealer");
+  DealCard("player");
+  DealCard("dealer");
+  DealCard("player");
+  if(getCardTotal($scope.playerHand) == 21){
+      callWinner("win");
+  }
+}
+
+function Hit() {
+  DealCard("player");
+    if (getCardTotal($scope.playerHand) > 21){
+      callWinner("lose");
     }
-    if (phase == "Start") {//Deal 2 cards to dealer and player
-        clearTable();
-        DealCard("dealer");
-        DealCard("player"); 
-        DealCard("dealer");
-        DealCard("player");
-        
-    } else if (phase == "Hit") {//Deal 1 card to player and see busted or not
-        DealCard("player");
-        if (getCardTotal($scope.playerHand) > 21){
-            callWinner("loose");
-        }
-    } else if (phase == "Stand") {
-        stand();
-    }
-    
 }
 
 function stand() {
-    $scope.dealerHand[0].image = "img/" + $scope.dealerHand[0].suit + $scope.dealerHand[0].number + ".png";
+    $scope.dealerHand[0].image = "img/cards/" + $scope.dealerHand[0].number + $scope.dealerHand[0].suit + ".png";
     if (getCardTotal($scope.dealerHand) > getCardTotal($scope.playerHand)) {
-        callWinner("loose");
-    } else if (getCardTotal($scope.dealerHand) == 21 && getCardTotal($scope.playerHand) == 21) {
+        callWinner("lose");
+    } else if (getCardTotal($scope.dealerHand) ==  getCardTotal($scope.playerHand) && getCardTotal($scope.dealerHand) > 17) {
         callWinner("Draw");
+    } else if (getCardTotal($scope.dealerHand) < getCardTotal($scope.playerHand)) {
+        callWinner("win");
     }
-    
+
     while(getCardTotal($scope.dealerHand) < 17) {
         DealCard("dealer");
         if (getCardTotal($scope.dealerHand) > 21) {
             callWinner("win");
-        } 
-        else if (getCardTotal($scope.dealerHand) < getCardTotal($scope.playerHand)) {
-            callWinner("loose");
         }
-        else if (getCardTotal($scope.dealerHand) == 21 && getCardTotal($scope.playerHand) == 21) {
+        else if (getCardTotal($scope.dealerHand) > getCardTotal($scope.playerHand)) {
+            callWinner("lose");
+        }
+        else if (getCardTotal($scope.dealerHand) ==  getCardTotal($scope.playerHand) && getCardTotal($scope.dealerHand) > 17) {
             callWinner("Draw");
         }
     }
 }
-    
+
 function callWinner(call) {
     var money = 0;
     switch(call) {
         case "win":
+        if (getCardTotal($scope.playerHand) == 21 && $scope.playerHand.length == 2){
+            $scope.playerAmount += $scope.playerAmountBet * 2.5;
+            money = $scope.playerAmountBet * 2.5;
+        } else {
             $scope.playerAmount += $scope.playerAmountBet * 2;
-            money = $scope.playerAmountBet * 2
+            money = $scope.playerAmountBet * 2;
+        }
             break;
-        case "loose":
+        case "lose":
             $scope.playerAmountBet = 0;
             break;
         case "Draw":
@@ -153,13 +172,15 @@ function callWinner(call) {
             break;
     }
     overlayDisplay(call, money);
-    //clearTable();
+    if (cards.length <= (cards.length / 5)) {//make deck fully when run out of cards at end of the game
+        deck();
+    }
+    GamePhase = "betting";
 }
 
 $scope.display = true;
 function overlayDisplay(txt, money) {
-    debugger;
-    $scope.overlayText = txt.toUpperCase(); 
+    $scope.overlayText = txt.toUpperCase();
     if (money == 0) {
         $scope.overlayMoney = "";//change to disable later
     } else {
@@ -168,8 +189,8 @@ function overlayDisplay(txt, money) {
     $scope.display = false;
 }
 
-function clearTable(){
-    debugger;
+function clearTable(){// clear Hends and betting on table
+    //$scope.playerAmountBet = 0;
     $scope.playerHand = [];
     $scope.dealerHand = [];
 }

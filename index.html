@@ -19,16 +19,18 @@
                     <div id="dealer">
                         <div id="dealer_cards">
                             <div id="dealerHand" ng-repeat="x in dealerHand">
-                                <img ng-src="{{x.image}}" width="100px">
+                                <img ng-src="{{x.image}}" width="100px" height="150px">
                             </div>
+                            <p>{{dealerHandTotal}}</p>
                         </div>
 
                     </div>
                     <div id="player">
                         <div id="user_cards">
                             <div id="myHand" ng-repeat="y in playerHand">
-                                <img ng-src="{{y.image}}" width="100px">
+                                <img ng-src="{{y.image}}" width="100px" height="150px">
                             </div>
+                            <p>{{playerHandTotal}}</p>
                         </div>
                     </div>
                 </div>        
@@ -47,9 +49,9 @@
                     <div id="user_bet">
                         <input type="button" id="betAmnt1" ng-click="betMoney(5)" value="5">
                         <input type="button" id="betAmnt2" ng-click="betMoney(25)" value="25">
-                        <input type="button" id="betAmnt3" ng-click="betMoney(50)" value="50">
-                        <input type="button" id="betAmnt4" ng-click="betMoney(100)" value="100">
-                        <input type="button" id="betAmnt5" ng-click="betMoney(500)" value="500">
+                        <input type="button" id="betAmnt3" ng-click="betMoney(100)" value="100">
+                        <input type="button" id="betAmnt4" ng-click="betMoney(500)" value="500">
+                        <input type="button" id="betAmnt5" ng-click="betMoney(1000)" value="1000">
                     </div>
                 </div>
             </div>

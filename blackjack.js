@@ -17,10 +17,8 @@ $scope.betMoney = function(betamount) {
 $scope.playerHand = [];
 $scope.dealerHand = [];
 
-
-function card(value, value_opt, number, suit, image) {
+function card(value, number, suit, image) {
     this.value = value;
-    this.value_opt = value_opt;
     this.number = number;
     this.suit = suit;
     this.image = image;
@@ -36,21 +34,16 @@ function deck() {
     var suits = ["s", "d", "h", "c"];//"Spades", "Diamonds", "Hearts", "Clubs"
     for (var i = 0; i < suits.length; i++) {
         for (var j = 0; j < cardNumbers.length; j++) {
-            // Var 2 - value_opt
-            var value_opt = null;
-            if (cardNumbers[j] == "A") value_opt = 11;
             var value = j + 1;
             if (typeof cardNumbers[j] != "number") {
                 if (cardNumbers[j] == "A"){
-                    value = 1;
-
+                    value = 11;
                 }
                 else {value = 10}
             }
 
             cards.push(new card(
                 value,
-				        value_opt,
                 cardNumbers[j],
                 suits[i],
                 "img/cards/" + cardNumbers[j] + suits[i] +  ".png"
@@ -67,20 +60,44 @@ function pullCard() {
     return ChosenCard;
 }
 
-function getCardTotal(arrayIn) {
-    var total = 0, totalMax = 0;
-    for (var i = 0; i< arrayIn.length; i++ ) {
-        if (arrayIn[i].number == "A") {
-            totalMax += 11;
+    function getCardTotalJohn(arrayIn) {
+        var total = 0;
+        var acesCount = 0; 
+        arrayIn.sort(function (a, b) { return a - b });
+        for (var i = 0; i < arrayIn.length; ++i) {
+            if (arrayIn[i] == 11) {
+                ++acesCount;
+                if (total + 11 <= 21)
+                    total += 11;
+                else
+                    total += 1;
+            }
+            else
+                total += arrayIn[i];
         }
-        else {
-            totalMax += arrayIn[i].value;
-        }
-        total += arrayIn[i].value ;
-        if (totalMax > total && totalMax <= 21)
-            total = totalMax;
+        return total;
     }
-	return total;
+
+function getCardTotal(arrayIn) {
+    debugger;
+    var total = 0;
+    arrayIn.sort(function (a, b) { return a.value - b.value });
+    for (var i=0; i< arrayIn.length; ++i) {
+        if (arrayIn[i].number=="A") {
+            if (total+11<=21)
+                total += 11; 
+            else
+                total+=1; 
+        }
+        else
+            total += arrayIn[i].value; 
+    }
+    return total;
+}
+
+function showtotal() {
+    $scope.dealerHandTotal = getCardTotal($scope.dealerHand);
+    $scope.playerHandTotal = getCardTotal($scope.playerHand);
 }
 
 function DealCard(Who) {
@@ -90,8 +107,6 @@ function DealCard(Who) {
               $scope.dealerHand.push(pullCard());
               if ($scope.dealerHand.length == 1) {$scope.dealerHand[0].image = "img/cards/back.png"}
           }
-
-
 }
 
 //function sleep (time) {
@@ -118,6 +133,7 @@ function Start() {
   if(getCardTotal($scope.playerHand) == 21){
       callWinner("win");
   }
+    showtotal();
 }
 
 function Hit() {
@@ -125,6 +141,7 @@ function Hit() {
     if (getCardTotal($scope.playerHand) > 21){
       callWinner("lose");
     }
+    showtotal();
 }
 
 function stand() {
@@ -149,6 +166,7 @@ function stand() {
             callWinner("Draw");
         }
     }
+    showtotal();
 }
 
 function callWinner(call) {
